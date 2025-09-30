@@ -47,22 +47,15 @@ const NewRequest = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { state } = useAuth();
+
+  // derive initial step from query ?step=schedule|payment|1..3
   const initialStep = useMemo(() => {
     const stepParam = searchParams.get('step');
+    if (stepParam === 'schedule') return 2;
+    if (stepParam === 'payment') return 3;
 
-    if (stepParam === 'schedule') {
-      return 2;
-    }
-
-    if (stepParam === 'payment') {
-      return 3;
-    }
-
-    const numericStep = Number.parseInt(stepParam ?? '1', 10);
-    if (Number.isFinite(numericStep) && numericStep >= 1 && numericStep <= 3) {
-      return numericStep;
-    }
-
+    const numeric = Number.parseInt(stepParam ?? '1', 10);
+    if (Number.isFinite(numeric) && numeric >= 1 && numeric <= 3) return numeric;
     return 1;
   }, [searchParams]);
 
@@ -70,9 +63,14 @@ const NewRequest = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  the const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
+
+  useEffect(() => {
+    setCurrentStep(initialStep);
+  }, [initialStep]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -155,16 +153,11 @@ const NewRequest = () => {
     }
   };
 
-  useEffect(() => {
-    setCurrentStep(initialStep);
-  }, [initialStep]);
 
   const charges = useMemo(() => calculateCharges(), []);
 
   const handleSubmit = async () => {
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
 
     if (!state.user?.id) {
       setSubmitError('You need to be logged in to create a delivery request.');
@@ -183,6 +176,7 @@ const NewRequest = () => {
       landmark: formData.destinationAddress.landmark.trim(),
       contactNumber: formData.destinationAddress.contactNumber.trim()
     };
+
 
     const payload = {
       userId: state.user.id,
@@ -207,7 +201,6 @@ const NewRequest = () => {
 
     try {
       const createdRequest = await apiClient.post('/requests', payload);
-
       if (createdRequest?.id) {
         navigate(`/request/${createdRequest.id}`);
       } else {
@@ -219,6 +212,8 @@ const NewRequest = () => {
       setIsSubmitting(false);
     }
   };
+
+
   const paymentOptions = [
     { id: 'card', label: 'Credit/Debit Card' },
     { id: 'upi', label: 'UPI' },
@@ -264,6 +259,7 @@ const NewRequest = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
+                {/* Order number */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Order Number *
@@ -281,6 +277,7 @@ const NewRequest = () => {
                   {errors.orderNumber && <p className="text-red-600 text-xs mt-1">{errors.orderNumber}</p>}
                 </div>
 
+                {/* Platform */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     E-commerce Platform *
@@ -303,6 +300,7 @@ const NewRequest = () => {
                   {errors.platform && <p className="text-red-600 text-xs mt-1">{errors.platform}</p>}
                 </div>
 
+                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Product Description *
@@ -322,6 +320,7 @@ const NewRequest = () => {
                   )}
                 </div>
 
+                {/* Original ETA */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Original Delivery Date *
@@ -338,6 +337,7 @@ const NewRequest = () => {
                   {errors.originalETA && <p className="text-red-600 text-xs mt-1">{errors.originalETA}</p>}
                 </div>
 
+                {/* Receipt */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Upload Receipt (PDF only, max 5MB)
@@ -348,13 +348,12 @@ const NewRequest = () => {
                     onChange={handleFileChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  {selectedFile && (
-                    <p className="text-green-600 text-sm mt-1">✓ {selectedFile.name} selected</p>
-                  )}
+                  {selectedFile && <p className="text-green-600 text-sm mt-1">✓ {selectedFile.name} selected</p>}
                   {errors.file && <p className="text-red-600 text-xs mt-1">{errors.file}</p>}
                 </div>
               </div>
 
+              {/* Map */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Select Warehouse</h3>
                 <WarehouseMap
@@ -384,6 +383,7 @@ const NewRequest = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left */}
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -429,6 +429,7 @@ const NewRequest = () => {
                 </div>
               </div>
 
+              {/* Right */}
               <div className="space-y-6">
                 <h3 className="text-lg font-medium text-gray-900">Destination Address</h3>
 
@@ -562,6 +563,7 @@ const NewRequest = () => {
                     <span className="text-gray-600">Delivery Charge</span>
                     <span className="font-medium">₹{charges.deliveryCharge}</span>
                   </div>
+
                   <div className="border-t pt-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
@@ -644,3 +646,4 @@ const NewRequest = () => {
 };
 
 export default NewRequest;
+
