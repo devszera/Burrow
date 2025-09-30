@@ -3,8 +3,14 @@ import PropTypes from 'prop-types';
 import { MapPin, Navigation } from 'lucide-react';
 import { warehouses } from '../../data/mockData';
 
+/** @typedef {import('../../types.js').Warehouse} Warehouse */
+
+/**
+ * @param {{ onWarehouseSelect?: (warehouse: Warehouse) => void; selectedWarehouseId?: string }} props
+ */
 const WarehouseMap = ({ onWarehouseSelect, selectedWarehouseId }) => {
   const [userLocation, setUserLocation] = useState('');
+  /** @type {[Warehouse[], import('react').Dispatch<import('react').SetStateAction<Warehouse[]>>]} */
   const [nearbyWarehouses, setNearbyWarehouses] = useState(warehouses);
 
   const handleLocationSearch = () => {

@@ -1,6 +1,13 @@
 import PropTypes from 'prop-types';
 import { Check, Clock, Package, Truck, Home } from 'lucide-react';
 
+/**
+ * @typedef {import('../../types.js').DeliveryStatus} DeliveryStatus
+ * @typedef {import('../../types.js').StatusHistoryEntry} StatusHistoryEntry
+ */
+
+/** @type {Record<DeliveryStatus, { label: string; icon: import('react').ComponentType<{ className?: string }>; color: string; bgColor: string }>}
+ */
 const statusConfig = {
   submitted: {
     label: 'Request Submitted',
@@ -76,6 +83,7 @@ const statusConfig = {
   },
 };
 
+/** @type {DeliveryStatus[]} */
 const statusOrder = [
   'submitted',
   'payment_pending',
@@ -89,6 +97,9 @@ const statusOrder = [
   'delivered',
 ];
 
+/**
+ * @param {{ currentStatus: DeliveryStatus; statusHistory?: StatusHistoryEntry[] }} props
+ */
 const StatusTracker = ({ currentStatus, statusHistory }) => {
   const getCurrentStatusIndex = () => statusOrder.indexOf(currentStatus);
 

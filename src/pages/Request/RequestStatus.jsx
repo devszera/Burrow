@@ -3,10 +3,16 @@ import { ArrowLeft, Download, MessageCircle, Calendar } from 'lucide-react';
 import StatusTracker from '../../components/StatusTracker/StatusTracker';
 import { mockRequests, warehouses } from '../../data/mockData';
 
+/**
+ * @typedef {import('../../types.js').DeliveryRequest} DeliveryRequest
+ * @typedef {import('../../types.js').Warehouse} Warehouse
+ */
+
 const RequestStatus = () => {
   const { id } = useParams();
+  /** @type {DeliveryRequest | undefined} */
   const request = mockRequests.find((req) => req.id === id);
-  
+
   if (!request) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -21,6 +27,7 @@ const RequestStatus = () => {
     );
   }
 
+  /** @type {Warehouse | undefined} */
   const warehouse = warehouses.find((warehouseItem) => warehouseItem.id === request.warehouseId);
 
   return (

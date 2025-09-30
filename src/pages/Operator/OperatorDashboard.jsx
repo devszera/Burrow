@@ -2,26 +2,37 @@ import { useState } from 'react';
 import { Search, Filter, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { mockRequests } from '../../data/mockData';
 
+/**
+ * @typedef {import('../../types.js').DeliveryRequest} DeliveryRequest
+ * @typedef {import('../../types.js').DeliveryStatus} DeliveryStatus
+ */
+
 const OperatorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(/** @type {DeliveryRequest | null} */ (null));
 
+  /** @type {DeliveryRequest[]} */
   const filteredRequests = mockRequests.filter((request) => {
-    const matchesSearch = request.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.productDescription.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      request.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.productDescription.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
   const stats = {
     total: mockRequests.length,
-    pending: mockRequests.filter(req => req.status === 'approval_pending').length,
-    approved: mockRequests.filter(req => req.status === 'approved').length,
-    delivered: mockRequests.filter(req => req.status === 'delivered').length
+    pending: mockRequests.filter((req) => req.status === 'approval_pending').length,
+    approved: mockRequests.filter((req) => req.status === 'approved').length,
+    delivered: mockRequests.filter((req) => req.status === 'delivered').length,
   };
 
+  /**
+   * @param {DeliveryStatus} status
+   * @returns {import('react').ReactElement}
+   */
   const getStatusBadge = (status) => {
     const config = {
       submitted: { color: 'bg-blue-100 text-blue-800', label: 'Submitted' },
@@ -43,6 +54,10 @@ const OperatorDashboard = () => {
     );
   };
 
+  /**
+   * @param {string} requestId
+   * @param {DeliveryStatus} newStatus
+   */
   const handleStatusUpdate = (requestId, newStatus) => {
     // In a real app, this would update the database
     console.log(`Updating request ${requestId} to status ${newStatus}`);

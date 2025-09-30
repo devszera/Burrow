@@ -4,62 +4,78 @@ import { Upload, Calendar, CreditCard } from 'lucide-react';
 import WarehouseMap from '../../components/Map/WarehouseMap';
 import { ecommercePlatforms, timeSlots } from '../../data/mockData';
 
+/**
+ * @typedef {import('../../types.js').RequestFormData} RequestFormData
+ * @typedef {import('../../types.js').FormErrorMap} FormErrorMap
+ * @typedef {import('../../types.js').Warehouse} Warehouse
+ */
+
 
 const NewRequest = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    orderNumber: '',
-    platform: '',
-    productDescription: '',
-    originalETA: '',
-    warehouse: null,
-    scheduledDeliveryDate: '',
-    deliveryTimeSlot: '',
-    destinationAddress: {
-      line1: '',
-      line2: '',
-      city: '',
-      state: '',
-      pincode: '',
-      landmark: '',
-      contactNumber: ''
-    }
-  });
-  
+  const createInitialFormState = () =>
+    /** @type {RequestFormData} */ ({
+      orderNumber: '',
+      platform: '',
+      productDescription: '',
+      originalETA: '',
+      warehouse: null,
+      scheduledDeliveryDate: '',
+      deliveryTimeSlot: '',
+      destinationAddress: {
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        pincode: '',
+        landmark: '',
+        contactNumber: '',
+      },
+    });
+
+  const [formData, setFormData] = useState(createInitialFormState);
+  /** @type {[File | null, import('react').Dispatch<import('react').SetStateAction<File | null>>]} */
   const [selectedFile, setSelectedFile] = useState(null);
+  /** @type {[FormErrorMap, import('react').Dispatch<import('react').SetStateAction<FormErrorMap>>]} */
   const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
+  /**
+   * @param {import('react').ChangeEvent<HTMLInputElement | HTMLSelectElement>} event
+   */
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
       setFormData({
         ...formData,
         destinationAddress: {
           ...formData.destinationAddress,
-          [addressField]: value
-        }
+          [addressField]: value,
+        },
       });
     } else {
       setFormData({
         ...formData,
-        [name]: value
+        [name]: value,
       });
     }
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
+        [name]: '',
       });
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
+  /**
+   * @param {import('react').ChangeEvent<HTMLInputElement>} event
+   */
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
     if (file) {
       if (file.type !== 'application/pdf') {
         setErrors({ ...errors, file: 'Only PDF files are allowed' });
@@ -74,7 +90,11 @@ const NewRequest = () => {
     }
   };
 
+  /**
+   * @returns {boolean}
+   */
   const validateStep1 = () => {
+    /** @type {FormErrorMap} */
     const newErrors = {};
     
     if (!formData.orderNumber.trim()) newErrors.orderNumber = 'Order number is required';
@@ -87,7 +107,11 @@ const NewRequest = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * @returns {boolean}
+   */
   const validateStep2 = () => {
+    /** @type {FormErrorMap} */
     const newErrors = {};
     
     if (!formData.scheduledDeliveryDate) newErrors.scheduledDeliveryDate = 'Delivery date is required';
@@ -117,6 +141,9 @@ const NewRequest = () => {
     }, 1000);
   };
 
+  /**
+   * @returns {{ baseHandlingFee: number; storageFee: number; deliveryCharge: number; subtotal: number; gst: number; total: number }}
+   */
   const calculateCharges = () => {
     const baseHandlingFee = 49;
     const storageFee = 20; // Assuming 2 extra days
@@ -268,8 +295,15 @@ const NewRequest = () => {
 
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Select Warehouse</h3>
-                <WarehouseMap 
-                  onWarehouseSelect={(warehouse) => setFormData({ ...formData, warehouse })}
+                <WarehouseMap
+                  onWarehouseSelect={
+                    /**
+                     * @param {Warehouse} warehouse
+                     */
+                    (warehouse) => {
+                      setFormData({ ...formData, warehouse });
+                    }
+                  }
                   selectedWarehouseId={formData.warehouse?.id}
                 />
                 {errors.warehouse && <p className="text-red-600 text-xs mt-1">{errors.warehouse}</p>}

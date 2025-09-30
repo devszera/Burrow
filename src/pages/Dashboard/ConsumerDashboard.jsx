@@ -3,18 +3,25 @@ import { Package, Plus, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { mockRequests } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
 
+/** @typedef {import('../../types.js').DeliveryRequest} DeliveryRequest */
+
 const ConsumerDashboard = () => {
   const { state } = useAuth();
-  
+
   // Filter requests for current user
-  const userRequests = mockRequests.filter(req => req.userId === state.user?.id);
-  
+  /** @type {DeliveryRequest[]} */
+  const userRequests = mockRequests.filter((req) => req.userId === state.user?.id);
+
   const stats = {
-    active: userRequests.filter(req => !['delivered', 'rejected'].includes(req.status)).length,
-    pending: userRequests.filter(req => ['submitted', 'approval_pending', 'payment_pending'].includes(req.status)).length,
-    completed: userRequests.filter(req => req.status === 'delivered').length
+    active: userRequests.filter((req) => !['delivered', 'rejected'].includes(req.status)).length,
+    pending: userRequests.filter((req) => ['submitted', 'approval_pending', 'payment_pending'].includes(req.status)).length,
+    completed: userRequests.filter((req) => req.status === 'delivered').length,
   };
 
+  /**
+   * @param {DeliveryRequest['status']} status
+   * @returns {import('react').ReactElement}
+   */
   const getStatusBadge = (status) => {
     switch (status) {
       case 'submitted':

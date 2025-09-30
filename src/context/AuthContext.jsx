@@ -1,14 +1,26 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * @typedef {import('../types.js').AuthState} AuthState
+ * @typedef {import('../types.js').AuthAction} AuthAction
+ * @typedef {import('../types.js').User} User
+ */
+
 const AuthContext = createContext(null);
 
+/** @type {AuthState} */
 const initialState = {
   user: null,
   isLoading: false,
   error: null,
 };
 
+/**
+ * @param {AuthState} state
+ * @param {AuthAction} action
+ * @returns {AuthState}
+ */
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN_START':
@@ -29,12 +41,18 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  /**
+   * @param {string} email
+   * @param {string} password
+   * @returns {Promise<void>}
+   */
   const login = async (email, password) => {
     dispatch({ type: 'LOGIN_START' });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (email === 'admin@burrow.com' && password === 'admin123') {
+      /** @type {User} */
       const user = {
         id: '1',
         name: 'Admin User',
@@ -47,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('burrow_token', 'mock_admin_token');
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
     } else if (email === 'user@test.com' && password === 'user123') {
+      /** @type {User} */
       const user = {
         id: '2',
         name: 'Test User',
@@ -63,11 +82,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  /**
+   * @param {{ name: string; email: string; phone: string }} userData
+   * @returns {Promise<void>}
+   */
   const register = async (userData) => {
     dispatch({ type: 'LOGIN_START' });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
+    /** @type {User} */
     const user = {
       id: Date.now().toString(),
       name: userData.name,

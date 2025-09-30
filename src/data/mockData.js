@@ -1,3 +1,7 @@
+/** @typedef {import('../types.js').Warehouse} Warehouse */
+/** @typedef {import('../types.js').DeliveryRequest} DeliveryRequest */
+
+/** @type {Warehouse[]} */
 export const warehouses = [
   {
     id: '1',
@@ -55,6 +59,7 @@ export const warehouses = [
   },
 ];
 
+/** @type {DeliveryRequest[]} */
 export const mockRequests = [
   {
     id: 'REQ001',

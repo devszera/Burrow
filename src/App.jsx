@@ -11,6 +11,15 @@ import NewRequest from './pages/Request/NewRequest';
 import RequestStatus from './pages/Request/RequestStatus';
 import OperatorDashboard from './pages/Operator/OperatorDashboard';
 
+/** @typedef {import('./types.js').UserRole} UserRole */
+
+/**
+ * @param {{
+ *  children: import('react').ReactNode;
+ *  requireAuth?: boolean;
+ *  allowedRoles?: UserRole[];
+ * }} props
+ */
 const ProtectedRoute = ({ children, requireAuth = true, allowedRoles = [] }) => {
   const { state } = useAuth();
 
