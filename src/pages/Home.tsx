@@ -1,12 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Shield, MapPin, Calendar, ArrowRight, CheckCircle } from 'lucide-react';
 import WarehouseMap from '../components/Map/WarehouseMap';
 import { Warehouse } from '../types';
+import { api } from '../services/api';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [isLoadingWarehouses, setIsLoadingWarehouses] = useState(true);
+  const [warehouseError, setWarehouseError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadWarehouses = async () => {
+      setIsLoadingWarehouses(true);
+      setWarehouseError(null);
+
+      try {
+        const data = await api.getWarehouses();
+        if (!ignore) {
+          setWarehouses(data);
+        }
+      } catch (error) {
+        if (!ignore) {
+          const message = error instanceof Error ? error.message : 'Failed to load warehouses';
+          setWarehouseError(message);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoadingWarehouses(false);
+        }
+      }
+    };
+
+    loadWarehouses();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleGetStarted = () => {
     if (selectedWarehouse) {
@@ -95,10 +130,15 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
-              <WarehouseMap 
+              <WarehouseMap
+                warehouses={warehouses}
+                isLoading={isLoadingWarehouses}
                 onWarehouseSelect={setSelectedWarehouse}
                 selectedWarehouseId={selectedWarehouse?.id}
               />
+              {warehouseError && (
+                <p className="text-red-600 text-sm mt-2 text-center lg:text-left">{warehouseError}</p>
+              )}
             </div>
             
             <div className="space-y-6">

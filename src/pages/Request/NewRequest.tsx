@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Calendar, MapPin, CreditCard } from 'lucide-react';
+import { Upload, Calendar, CreditCard } from 'lucide-react';
 import WarehouseMap from '../../components/Map/WarehouseMap';
 import { Warehouse } from '../../types';
 import { ecommercePlatforms, timeSlots } from '../../data/mockData';
+import { api, CreateRequestPayload } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 interface FormData {
   orderNumber: string;
@@ -26,6 +28,7 @@ interface FormData {
 
 const NewRequest: React.FC = () => {
   const navigate = useNavigate();
+  const { state } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     orderNumber: '',
@@ -45,9 +48,45 @@ const NewRequest: React.FC = () => {
       contactNumber: ''
     }
   });
-  
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [isLoadingWarehouses, setIsLoadingWarehouses] = useState(true);
+  const [warehouseError, setWarehouseError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadWarehouses = async () => {
+      setIsLoadingWarehouses(true);
+      setWarehouseError(null);
+
+      try {
+        const data = await api.getWarehouses();
+        if (!ignore) {
+          setWarehouses(data);
+        }
+      } catch (error) {
+        if (!ignore) {
+          const message = error instanceof Error ? error.message : 'Failed to load warehouses';
+          setWarehouseError(message);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoadingWarehouses(false);
+        }
+      }
+    };
+
+    loadWarehouses();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -129,11 +168,61 @@ const NewRequest: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Simulate request submission
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1000);
+  const handleSubmit = async () => {
+    if (!state.user) {
+      setSubmitError('You must be logged in to submit a request.');
+      return;
+    }
+
+    if (!formData.warehouse) {
+      setErrors(prev => ({ ...prev, warehouse: 'Warehouse selection is required' }));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const computedCharges = calculateCharges();
+
+    try {
+      const requestPayload: CreateRequestPayload = {
+        userId: state.user.id,
+        orderNumber: formData.orderNumber,
+        platform: formData.platform,
+        productDescription: formData.productDescription,
+        warehouseId: formData.warehouse.id,
+        originalETA: formData.originalETA,
+        scheduledDeliveryDate: formData.scheduledDeliveryDate,
+        deliveryTimeSlot: formData.deliveryTimeSlot,
+        destinationAddress: {
+          id: `addr-${Date.now()}`,
+          line1: formData.destinationAddress.line1,
+          line2: formData.destinationAddress.line2 || '',
+          city: formData.destinationAddress.city,
+          state: formData.destinationAddress.state,
+          pincode: formData.destinationAddress.pincode,
+          landmark: formData.destinationAddress.landmark || '',
+          contactNumber: formData.destinationAddress.contactNumber
+        },
+        paymentDetails: {
+          baseHandlingFee: computedCharges.baseHandlingFee,
+          storageFee: computedCharges.storageFee,
+          deliveryCharge: computedCharges.deliveryCharge,
+          gst: parseFloat(computedCharges.gst.toFixed(2)),
+          totalAmount: parseFloat(computedCharges.total.toFixed(2)),
+          paymentMethod: 'online',
+          paymentStatus: 'pending'
+        }
+      };
+
+      const createdRequest = await api.createRequest(requestPayload);
+      navigate(`/request/${createdRequest.id}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to submit request';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateCharges = () => {
@@ -287,10 +376,23 @@ const NewRequest: React.FC = () => {
 
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Select Warehouse</h3>
-                <WarehouseMap 
-                  onWarehouseSelect={(warehouse) => setFormData({ ...formData, warehouse })}
+                <WarehouseMap
+                  warehouses={warehouses}
+                  isLoading={isLoadingWarehouses}
+                  onWarehouseSelect={(warehouse) => {
+                    setFormData(prev => ({ ...prev, warehouse }));
+                    setErrors(prev => {
+                      if (!prev.warehouse) return prev;
+                      const updatedErrors = { ...prev };
+                      delete updatedErrors.warehouse;
+                      return updatedErrors;
+                    });
+                  }}
                   selectedWarehouseId={formData.warehouse?.id}
                 />
+                {warehouseError && (
+                  <p className="text-red-600 text-xs mt-2">{warehouseError}</p>
+                )}
                 {errors.warehouse && <p className="text-red-600 text-xs mt-1">{errors.warehouse}</p>}
               </div>
             </div>
@@ -535,6 +637,10 @@ const NewRequest: React.FC = () => {
               </div>
             </div>
 
+            {submitError && (
+              <p className="text-red-600 text-sm mt-6">{submitError}</p>
+            )}
+
             <div className="flex justify-between mt-8">
               <button
                 onClick={() => setCurrentStep(2)}
@@ -544,9 +650,10 @@ const NewRequest: React.FC = () => {
               </button>
               <button
                 onClick={handleSubmit}
-                className="px-8 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                disabled={isSubmitting}
+                className="px-8 py-2 bg-green-600 text-white rounded-lg transition-colors hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Proceed to Pay ₹{charges.total.toFixed(2)}
+                {isSubmitting ? 'Submitting...' : `Proceed to Pay ₹${charges.total.toFixed(2)}`}
               </button>
             </div>
           </div>

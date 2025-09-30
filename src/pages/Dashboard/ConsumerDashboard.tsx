@@ -1,14 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Plus, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
-import { mockRequests } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
+import { Request } from '../../types';
+import { api } from '../../services/api';
 
 const ConsumerDashboard: React.FC = () => {
   const { state } = useAuth();
-  
-  // Filter requests for current user
-  const userRequests = mockRequests.filter(req => req.userId === state.user?.id);
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const userId = state.user?.id;
+    if (!userId) {
+      setRequests([]);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchRequests = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const data = await api.getRequests({ userId });
+        if (!ignore) {
+          setRequests(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          const message = err instanceof Error ? err.message : 'Failed to load requests';
+          setError(message);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchRequests();
+
+    return () => {
+      ignore = true;
+    };
+  }, [state.user?.id, reloadToken]);
+
+  const handleRetry = () => setReloadToken(prev => prev + 1);
+
+  const userRequests = requests;
   
   const stats = {
     active: userRequests.filter(req => !['delivered', 'rejected'].includes(req.status)).length,
@@ -116,9 +160,25 @@ const ConsumerDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Recent Requests</h2>
           </div>
-          
+
           <div className="divide-y divide-gray-200">
-            {userRequests.length > 0 ? (
+            {isLoading ? (
+              <div className="px-6 py-8 text-center">
+                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">Loading your requests...</p>
+              </div>
+            ) : error ? (
+              <div className="px-6 py-8 text-center">
+                <p className="text-red-600 font-medium">Failed to load requests</p>
+                <p className="text-gray-500 text-sm mt-1">{error}</p>
+                <button
+                  onClick={handleRetry}
+                  className="inline-flex items-center px-4 py-2 mt-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : userRequests.length > 0 ? (
               userRequests.slice(0, 5).map((request) => (
                 <div key={request.id} className="px-6 py-4">
                   <div className="flex items-center justify-between">

@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
-import { warehouses } from '../../data/mockData';
 import { Warehouse } from '../../types';
 
 interface WarehouseMapProps {
+  warehouses: Warehouse[];
   onWarehouseSelect?: (warehouse: Warehouse) => void;
   selectedWarehouseId?: string;
+  isLoading?: boolean;
 }
 
-const WarehouseMap: React.FC<WarehouseMapProps> = ({ 
-  onWarehouseSelect, 
-  selectedWarehouseId 
+const WarehouseMap: React.FC<WarehouseMapProps> = ({
+  warehouses,
+  onWarehouseSelect,
+  selectedWarehouseId,
+  isLoading = false
 }) => {
   const [userLocation, setUserLocation] = useState<string>('');
   const [nearbyWarehouses, setNearbyWarehouses] = useState<Warehouse[]>(warehouses);
+
+  useEffect(() => {
+    setNearbyWarehouses(warehouses);
+  }, [warehouses]);
 
   const handleLocationSearch = () => {
     // Simulate finding nearby warehouses based on user input
@@ -32,7 +39,7 @@ const WarehouseMap: React.FC<WarehouseMapProps> = ({
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="mb-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">Find Nearby Warehouses</h3>
-        
+
         <div className="flex gap-3">
           <div className="flex-1">
             <input
@@ -65,7 +72,15 @@ const WarehouseMap: React.FC<WarehouseMapProps> = ({
       {/* Warehouses List */}
       <div className="space-y-3">
         <h4 className="font-medium text-gray-900">Nearby Warehouses</h4>
-        
+
+        {isLoading && (
+          <p className="text-sm text-gray-500">Loading warehouses...</p>
+        )}
+
+        {!isLoading && nearbyWarehouses.length === 0 && (
+          <p className="text-sm text-gray-500">No warehouses found. Try adjusting your search.</p>
+        )}
+
         {nearbyWarehouses.map((warehouse) => (
           <div
             key={warehouse.id}

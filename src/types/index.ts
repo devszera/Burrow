@@ -16,6 +16,7 @@ export interface Address {
   state: string;
   pincode: string;
   landmark?: string;
+  contactNumber?: string;
 }
 
 export interface Warehouse {
