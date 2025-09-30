@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Package, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -29,14 +28,14 @@ const Header = () => {
           <nav className="flex items-center space-x-8">
             {!state.user ? (
               <>
-                <Link
-                  to="/login"
+                <Link 
+                  to="/login" 
                   className="text-gray-700 hover:text-blue-500 transition-colors"
                 >
                   Login
                 </Link>
-                <Link
-                  to="/register"
+                <Link 
+                  to="/register" 
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   Sign Up
@@ -46,14 +45,14 @@ const Header = () => {
               <>
                 {!isOperatorRoute && (
                   <>
-                    <Link
-                      to="/dashboard"
+                    <Link 
+                      to="/dashboard" 
                       className="text-gray-700 hover:text-blue-500 transition-colors"
                     >
                       Dashboard
                     </Link>
-                    <Link
-                      to="/new-request"
+                    <Link 
+                      to="/new-request" 
                       className="text-gray-700 hover:text-blue-500 transition-colors"
                     >
                       New Request
@@ -62,8 +61,8 @@ const Header = () => {
                 )}
 
                 {state.user.role === 'operator' && !isOperatorRoute && (
-                  <Link
-                    to="/operator/dashboard"
+                  <Link 
+                    to="/operator/dashboard" 
                     className="text-blue-600 hover:text-blue-700 transition-colors"
                   >
                     Operator Portal
@@ -75,7 +74,7 @@ const Header = () => {
                     <User className="h-5 w-5" />
                     <span className="text-sm">{state.user.name}</span>
                   </div>
-
+                  
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-1 text-gray-700 hover:text-red-500 transition-colors"

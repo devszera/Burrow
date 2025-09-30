@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -58,29 +58,30 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     if (!validateForm()) return;
 
     try {
       await register(formData);
       navigate('/dashboard');
     } catch {
-      // Error handling is managed within AuthContext
+      // Error handling is done in AuthContext
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value
+      [e.target.name]: e.target.value
     });
-
-    if (errors[event.target.name]) {
+    
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
       setErrors({
         ...errors,
-        [event.target.name]: ''
+        [e.target.name]: ''
       });
     }
   };
@@ -240,7 +241,7 @@ const Register = () => {
               name="accept-terms"
               type="checkbox"
               checked={acceptTerms}
-              onChange={(event) => setAcceptTerms(event.target.checked)}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label htmlFor="accept-terms" className="ml-2 block text-sm text-gray-700">

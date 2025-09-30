@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -10,25 +10,25 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
+  
   const { state, login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     try {
       await login(formData.email, formData.password);
       navigate('/dashboard');
     } catch {
-      // Error handling is managed within AuthContext
+      // Error handling is done in AuthContext
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value
+      [e.target.name]: e.target.value
     });
   };
 
@@ -111,7 +111,7 @@ const Login = () => {
                 name="remember-me"
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -136,7 +136,7 @@ const Login = () => {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
+              Don't have an account?{' '}
               <Link to="/register" className="text-blue-600 hover:text-blue-500 font-medium">
                 Sign up
               </Link>

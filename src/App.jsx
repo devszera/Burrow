@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -29,7 +28,7 @@ const ProtectedRoute = ({ children, requireAuth = true, allowedRoles = [] }) => 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   requireAuth: PropTypes.bool,
-  allowedRoles: PropTypes.arrayOf(PropTypes.string)
+  allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };
 
 const AppContent = () => {
@@ -98,7 +97,7 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
+function App() {
   return (
     <AuthProvider>
       <Router>
@@ -106,6 +105,6 @@ const App = () => {
       </Router>
     </AuthProvider>
   );
-};
+}
 
 export default App;

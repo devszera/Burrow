@@ -1,99 +1,95 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Calendar, CreditCard } from 'lucide-react';
 import WarehouseMap from '../../components/Map/WarehouseMap';
 import { ecommercePlatforms, timeSlots } from '../../data/mockData';
-import { createRequest } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
 
-const initialFormData = {
-  orderNumber: '',
-  platform: '',
-  productDescription: '',
-  originalETA: '',
-  warehouse: null,
-  scheduledDeliveryDate: '',
-  deliveryTimeSlot: '',
-  destinationAddress: {
-    line1: '',
-    line2: '',
-    city: '',
-    state: '',
-    pincode: '',
-    landmark: '',
-    contactNumber: '',
-  },
-};
 
 const NewRequest = () => {
   const navigate = useNavigate();
-  const { state: authState } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState({
+    orderNumber: '',
+    platform: '',
+    productDescription: '',
+    originalETA: '',
+    warehouse: null,
+    scheduledDeliveryDate: '',
+    deliveryTimeSlot: '',
+    destinationAddress: {
+      line1: '',
+      line2: '',
+      city: '',
+      state: '',
+      pincode: '',
+      landmark: '',
+      contactNumber: ''
+    }
+  });
+  
   const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
+        ...formData,
         destinationAddress: {
-          ...prev.destinationAddress,
-          [addressField]: value,
-        },
-      }));
+          ...formData.destinationAddress,
+          [addressField]: value
+        }
+      });
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData({
+        ...formData,
+        [name]: value
+      });
     }
-
+    
+    // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
+      setErrors({
+        ...errors,
+        [name]: ''
+      });
     }
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0];
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
     if (file) {
       if (file.type !== 'application/pdf') {
-        setErrors((prev) => ({ ...prev, file: 'Only PDF files are allowed' }));
+        setErrors({ ...errors, file: 'Only PDF files are allowed' });
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setErrors((prev) => ({ ...prev, file: 'File size must be less than 5MB' }));
+        setErrors({ ...errors, file: 'File size must be less than 5MB' });
         return;
       }
       setSelectedFile(file);
-      setErrors((prev) => ({ ...prev, file: '' }));
+      setErrors({ ...errors, file: '' });
     }
   };
 
   const validateStep1 = () => {
     const newErrors = {};
-
+    
     if (!formData.orderNumber.trim()) newErrors.orderNumber = 'Order number is required';
     if (!formData.platform) newErrors.platform = 'Platform selection is required';
     if (!formData.productDescription.trim()) newErrors.productDescription = 'Product description is required';
     if (!formData.originalETA) newErrors.originalETA = 'Original ETA is required';
     if (!formData.warehouse) newErrors.warehouse = 'Warehouse selection is required';
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const validateStep2 = () => {
     const newErrors = {};
-
+    
     if (!formData.scheduledDeliveryDate) newErrors.scheduledDeliveryDate = 'Delivery date is required';
     if (!formData.deliveryTimeSlot) newErrors.deliveryTimeSlot = 'Time slot is required';
     if (!formData.destinationAddress.line1.trim()) newErrors['address.line1'] = 'Address line 1 is required';
@@ -101,7 +97,7 @@ const NewRequest = () => {
     if (!formData.destinationAddress.state.trim()) newErrors['address.state'] = 'State is required';
     if (!formData.destinationAddress.pincode.trim()) newErrors['address.pincode'] = 'Pincode is required';
     if (!formData.destinationAddress.contactNumber.trim()) newErrors['address.contactNumber'] = 'Contact number is required';
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -114,56 +110,28 @@ const NewRequest = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!authState.user?.id) {
-      setSubmitError('You must be signed in to create a request.');
-      return;
-    }
-
-    if (!validateStep2()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError('');
-
-    try {
-      const payload = {
-        userId: authState.user.id,
-        orderNumber: formData.orderNumber,
-        platform: formData.platform,
-        productDescription: formData.productDescription,
-        warehouseId: formData.warehouse?.id,
-        originalETA: formData.originalETA,
-        scheduledDeliveryDate: formData.scheduledDeliveryDate,
-        deliveryTimeSlot: formData.deliveryTimeSlot,
-        destinationAddress: formData.destinationAddress,
-      };
-
-      const { request } = await createRequest(payload);
-      navigate(`/request/${request.id}`);
-    } catch (error) {
-      setSubmitError(error.message || 'Unable to create request right now.');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleSubmit = () => {
+    // Simulate request submission
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1000);
   };
 
   const calculateCharges = () => {
     const baseHandlingFee = 49;
-    const storageFee = 20;
-    const deliveryCharge = 60;
+    const storageFee = 20; // Assuming 2 extra days
+    const deliveryCharge = 60; // Based on distance
     const subtotal = baseHandlingFee + storageFee + deliveryCharge;
     const gst = subtotal * 0.18;
     const total = subtotal + gst;
-
+    
     return {
       baseHandlingFee,
       storageFee,
       deliveryCharge,
       subtotal,
       gst,
-      total,
+      total
     };
   };
 
@@ -172,38 +140,34 @@ const NewRequest = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  step <= currentStep 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-300 text-gray-600'
+                }`}>
                   {step}
                 </div>
-                <span
-                  className={`ml-2 text-sm font-medium ${
-                    step <= currentStep ? 'text-blue-500' : 'text-gray-500'
-                  }`}
-                >
+                <span className={`ml-2 text-sm font-medium ${
+                  step <= currentStep ? 'text-blue-500' : 'text-gray-500'
+                }`}>
                   {step === 1 ? 'Order Details' : step === 2 ? 'Schedule Delivery' : 'Payment'}
                 </span>
                 {step < 3 && (
-                  <div className={`w-16 h-1 ml-4 ${step < currentStep ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                  <div className={`w-16 h-1 ml-4 ${
+                    step < currentStep ? 'bg-blue-500' : 'bg-gray-300'
+                  }`} />
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        {submitError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-red-600">{submitError}</p>
-          </div>
-        )}
-
+        {/* Step 1: Order Details */}
         {currentStep === 1 && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-6">
@@ -243,10 +207,8 @@ const NewRequest = () => {
                     }`}
                   >
                     <option value="">Select Platform</option>
-                    {ecommercePlatforms.map((platform) => (
-                      <option key={platform} value={platform}>
-                        {platform}
-                      </option>
+                    {ecommercePlatforms.map(platform => (
+                      <option key={platform} value={platform}>{platform}</option>
                     ))}
                   </select>
                   {errors.platform && <p className="text-red-600 text-xs mt-1">{errors.platform}</p>}
@@ -266,9 +228,7 @@ const NewRequest = () => {
                     }`}
                     placeholder="Brief description of the product"
                   />
-                  {errors.productDescription && (
-                    <p className="text-red-600 text-xs mt-1">{errors.productDescription}</p>
-                  )}
+                  {errors.productDescription && <p className="text-red-600 text-xs mt-1">{errors.productDescription}</p>}
                 </div>
 
                 <div>
@@ -298,7 +258,9 @@ const NewRequest = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   {selectedFile && (
-                    <p className="text-green-600 text-sm mt-1">✓ {selectedFile.name} selected</p>
+                    <p className="text-green-600 text-sm mt-1">
+                      ✓ {selectedFile.name} selected
+                    </p>
                   )}
                   {errors.file && <p className="text-red-600 text-xs mt-1">{errors.file}</p>}
                 </div>
@@ -306,8 +268,8 @@ const NewRequest = () => {
 
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Select Warehouse</h3>
-                <WarehouseMap
-                  onWarehouseSelect={(warehouse) => setFormData((prev) => ({ ...prev, warehouse }))}
+                <WarehouseMap 
+                  onWarehouseSelect={(warehouse) => setFormData({ ...formData, warehouse })}
                   selectedWarehouseId={formData.warehouse?.id}
                 />
                 {errors.warehouse && <p className="text-red-600 text-xs mt-1">{errors.warehouse}</p>}
@@ -325,6 +287,7 @@ const NewRequest = () => {
           </div>
         )}
 
+        {/* Step 2: Schedule Delivery */}
         {currentStep === 2 && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-6">
@@ -348,9 +311,7 @@ const NewRequest = () => {
                       errors.scheduledDeliveryDate ? 'border-red-300' : 'border-gray-300'
                     }`}
                   />
-                  {errors.scheduledDeliveryDate && (
-                    <p className="text-red-600 text-xs mt-1">{errors.scheduledDeliveryDate}</p>
-                  )}
+                  {errors.scheduledDeliveryDate && <p className="text-red-600 text-xs mt-1">{errors.scheduledDeliveryDate}</p>}
                 </div>
 
                 <div>
@@ -366,21 +327,17 @@ const NewRequest = () => {
                     }`}
                   >
                     <option value="">Select Time Slot</option>
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
+                    {timeSlots.map(slot => (
+                      <option key={slot} value={slot}>{slot}</option>
                     ))}
                   </select>
-                  {errors.deliveryTimeSlot && (
-                    <p className="text-red-600 text-xs mt-1">{errors.deliveryTimeSlot}</p>
-                  )}
+                  {errors.deliveryTimeSlot && <p className="text-red-600 text-xs mt-1">{errors.deliveryTimeSlot}</p>}
                 </div>
               </div>
 
               <div className="space-y-6">
                 <h3 className="text-lg font-medium text-gray-900">Destination Address</h3>
-
+                
                 <div className="grid grid-cols-1 gap-4">
                   <input
                     type="text"
@@ -414,6 +371,8 @@ const NewRequest = () => {
                         errors['address.city'] ? 'border-red-300' : 'border-gray-300'
                       }`}
                     />
+                    {errors['address.city'] && <p className="text-red-600 text-xs">{errors['address.city']}</p>}
+
                     <input
                       type="text"
                       name="address.state"
@@ -424,9 +383,8 @@ const NewRequest = () => {
                         errors['address.state'] ? 'border-red-300' : 'border-gray-300'
                       }`}
                     />
+                    {errors['address.state'] && <p className="text-red-600 text-xs">{errors['address.state']}</p>}
                   </div>
-                  {errors['address.city'] && <p className="text-red-600 text-xs">{errors['address.city']}</p>}
-                  {errors['address.state'] && <p className="text-red-600 text-xs">{errors['address.state']}</p>}
 
                   <input
                     type="text"
@@ -450,7 +408,7 @@ const NewRequest = () => {
                   />
 
                   <input
-                    type="text"
+                    type="tel"
                     name="address.contactNumber"
                     value={formData.destinationAddress.contactNumber}
                     onChange={handleInputChange}
@@ -459,9 +417,7 @@ const NewRequest = () => {
                       errors['address.contactNumber'] ? 'border-red-300' : 'border-gray-300'
                     }`}
                   />
-                  {errors['address.contactNumber'] && (
-                    <p className="text-red-600 text-xs">{errors['address.contactNumber']}</p>
-                  )}
+                  {errors['address.contactNumber'] && <p className="text-red-600 text-xs">{errors['address.contactNumber']}</p>}
                 </div>
               </div>
             </div>
@@ -471,7 +427,7 @@ const NewRequest = () => {
                 onClick={() => setCurrentStep(1)}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Back
+                Previous
               </button>
               <button
                 onClick={handleNext}
@@ -483,91 +439,96 @@ const NewRequest = () => {
           </div>
         )}
 
+        {/* Step 3: Payment */}
         {currentStep === 3 && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-6">
               <CreditCard className="h-6 w-6 text-blue-500 mr-2" />
-              <h2 className="text-2xl font-bold text-gray-900">Payment Summary</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Payment Details</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Charges Breakdown</h3>
-                  <div className="space-y-2 text-sm text-gray-600">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Service Charges</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Base Handling Fee</span>
+                    <span className="font-medium">₹{charges.baseHandlingFee}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Storage Fee (2 extra days)</span>
+                    <span className="font-medium">₹{charges.storageFee}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Delivery Charge</span>
+                    <span className="font-medium">₹{charges.deliveryCharge}</span>
+                  </div>
+                  <div className="border-t pt-3">
                     <div className="flex justify-between">
-                      <span>Base Handling Fee</span>
-                      <span>₹{charges.baseHandlingFee.toFixed(2)}</span>
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">₹{charges.subtotal}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Storage Fee</span>
-                      <span>₹{charges.storageFee.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Delivery Charge</span>
-                      <span>₹{charges.deliveryCharge.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>GST (18%)</span>
-                      <span>₹{charges.gst.toFixed(2)}</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between font-semibold text-gray-900">
-                      <span>Total</span>
-                      <span>₹{charges.total.toFixed(2)}</span>
+                      <span className="text-gray-600">GST (18%)</span>
+                      <span className="font-medium">₹{charges.gst.toFixed(2)}</span>
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Method</h3>
-                  <p className="text-sm text-gray-600">
-                    Payment will be collected once your request is approved. You will receive an email confirmation with the
-                    payment link.
-                  </p>
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between text-lg font-bold">
+                      <span>Total Amount</span>
+                      <span className="text-blue-600">₹{charges.total.toFixed(2)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">Order Summary</h3>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Order Number</span>
-                    <span className="font-medium text-gray-900">{formData.orderNumber || '—'}</span>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Payment Method</h3>
+                <div className="space-y-4">
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <label className="flex items-center">
+                      <input type="radio" name="payment" className="text-blue-600" defaultChecked />
+                      <span className="ml-2">Credit/Debit Card</span>
+                    </label>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Platform</span>
-                    <span className="font-medium text-gray-900">{formData.platform || '—'}</span>
+                  
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <label className="flex items-center">
+                      <input type="radio" name="payment" className="text-blue-600" />
+                      <span className="ml-2">UPI</span>
+                    </label>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Delivery Date</span>
-                    <span className="font-medium text-gray-900">
-                      {formData.scheduledDeliveryDate
-                        ? new Date(formData.scheduledDeliveryDate).toLocaleDateString()
-                        : '—'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Time Slot</span>
-                    <span className="font-medium text-gray-900">{formData.deliveryTimeSlot || '—'}</span>
-                  </div>
-                </div>
 
-                <div className="border-t pt-4">
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                  </button>
-                  <button
-                    onClick={() => setCurrentStep(2)}
-                    className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Back to Schedule
-                  </button>
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <label className="flex items-center">
+                      <input type="radio" name="payment" className="text-blue-600" />
+                      <span className="ml-2">Net Banking</span>
+                    </label>
+                  </div>
+
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <label className="flex items-center">
+                      <input type="radio" name="payment" className="text-blue-600" />
+                      <span className="ml-2">Wallet</span>
+                    </label>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={() => setCurrentStep(2)}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="px-8 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Proceed to Pay ₹{charges.total.toFixed(2)}
+              </button>
             </div>
           </div>
         )}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Package, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -58,7 +57,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-600">
-            © 2024 Burrow. All rights reserved. |
+            © 2024 Burrow. All rights reserved. | 
             <Link to="/privacy" className="hover:text-blue-500 transition-colors ml-1">Privacy Policy</Link>
           </p>
         </div>
