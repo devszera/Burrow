@@ -53,7 +53,9 @@ const TrackRequest = () => {
 
     try {
       const params = new URLSearchParams({ orderNumber: trimmedOrderNumber });
-      const data = await apiClient.get(`/requests?${params.toString()}`);
+
+      const data = await apiClient.get(`/delivery-requests?${params.toString()}`);
+
       const nextResults = Array.isArray(data) ? data : [];
       setResults(nextResults);
 
