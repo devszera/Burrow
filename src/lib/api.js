@@ -4,23 +4,52 @@ const DEFAULT_HEADERS = {
 
 const nodeProcess = typeof globalThis !== 'undefined' ? globalThis.process : undefined;
 
-const API_BASE_URL = (() => {
-  const normalise = (baseUrl) => baseUrl?.replace(/\/$/, '') ?? '';
+const normaliseBaseUrl = (baseUrl) => baseUrl?.replace(/\/$/, '') ?? '';
 
+const resolveDevApiPort = () => {
+  const explicitPort =
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEV_API_PORT) ||
+    nodeProcess?.env?.VITE_DEV_API_PORT;
+
+  if (explicitPort) {
+    return explicitPort;
+  }
+
+  if (typeof window !== 'undefined') {
+    const currentPort = window.location?.port;
+    if (currentPort === '5173' || currentPort === '4173') {
+      return '4000';
+    }
+  }
+
+  return undefined;
+};
+
+const API_BASE_URL = (() => {
   if (typeof import.meta !== 'undefined') {
     const fromVite = import.meta.env?.VITE_API_BASE_URL ?? '';
     if (fromVite) {
-      return normalise(fromVite);
+      return normaliseBaseUrl(fromVite);
     }
   }
 
   const envBaseUrl = nodeProcess?.env?.VITE_API_BASE_URL ?? '';
   if (envBaseUrl) {
-    return normalise(envBaseUrl);
+    return normaliseBaseUrl(envBaseUrl);
   }
 
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return normalise(window.location.origin);
+  if (typeof window !== 'undefined' && window.location) {
+    const { protocol, hostname } = window.location;
+    const devPort = resolveDevApiPort();
+
+    if (devPort) {
+      const derivedPort = devPort.replace(/^:/, '');
+      return normaliseBaseUrl(`${protocol}//${hostname}:${derivedPort}`);
+    }
+
+    if (window.location.origin) {
+      return normaliseBaseUrl(window.location.origin);
+    }
   }
 
   return '';
