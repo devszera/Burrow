@@ -53,6 +53,15 @@ const API_BASE_URL = (() => {
   }
 
   return '';
+
+const API_BASE_URL = (() => {
+  if (typeof import.meta !== 'undefined') {
+    const baseUrl = import.meta.env?.VITE_API_BASE_URL ?? '';
+    return baseUrl?.replace(/\/$/, '') ?? '';
+  }
+  const envBaseUrl = nodeProcess?.env?.VITE_API_BASE_URL ?? '';
+  return envBaseUrl?.replace(/\/$/, '') ?? '';
+
 })();
 
 let authToken = null;
@@ -70,11 +79,19 @@ function buildUrl(path) {
     return path;
   }
 
+
   if (API_BASE_URL) {
     return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
   }
 
   return path.startsWith('/') ? path : `/${path}`;
+
+  if (!API_BASE_URL) {
+    throw new Error('VITE_API_BASE_URL is not configured.');
+  }
+
+  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+
 }
 
 async function parseJsonResponse(response) {
