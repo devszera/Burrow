@@ -33,115 +33,110 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 page-fade">
+    <div className="min-h-screen flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 page-fade">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-gray-600">Sign in to your Burrow account</p>
+        <div className="text-center space-y-2">
+          <span className="burrow-chip">Welcome back</span>
+          <h2 className="text-3xl font-bold">Sign in to your Burrow account</h2>
+          <p className="text-burrow-text-secondary">We&apos;re glad to keep your deliveries on track.</p>
         </div>
 
         {state.error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="burrow-card border-red-200/70 bg-red-50/60 p-4 text-left">
             <p className="text-red-600 text-sm">{state.error}</p>
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800 text-sm font-medium mb-2">Demo Credentials For An Operator View:</p>
+        <div className="burrow-card p-5 bg-burrow-muted/60">
+          <p className="text-burrow-primary text-sm font-semibold mb-2">Demo credentials for an operator view:</p>
 
-          <p className="text-blue-700 text-xs">Operator 1: operator.one@burrow.com / OperatorDemo1</p>
-          <p className="text-blue-700 text-xs">Operator 2: operator.two@burrow.com / OperatorDemo2</p>
+          <p className="text-burrow-text-secondary text-xs">Operator 1: operator.one@burrow.com / OperatorDemo1</p>
+          <p className="text-burrow-text-secondary text-xs">Operator 2: operator.two@burrow.com / OperatorDemo2</p>
         </div>
 
         <form className="mt-8 space-y-6 fade-stagger" onSubmit={handleSubmit}>
-          <div className="space-y-4 fade-stagger">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+          <div className="burrow-card p-8 space-y-6">
+            <div className="space-y-4 fade-stagger">
+              <div>
+                <label htmlFor="email" className="sr-only">Email address</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-burrow-text-secondary" />
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-10 w-full px-3 py-3 border border-burrow-border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90"
+                    placeholder="Email address"
+                  />
                 </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Email address"
-                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="sr-only">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-burrow-text-secondary" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-10 pr-10 w-full px-3 py-3 border border-burrow-border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-burrow-text-secondary"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-burrow-text-secondary">
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="pl-10 pr-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Password"
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  className="h-4 w-4 rounded border-burrow-border text-burrow-primary focus:ring-burrow-primary"
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                 Remember me
               </label>
+
+              <div className="text-sm">
+                <Link to="/forgot-password" className="text-burrow-primary hover:text-burrow-secondary">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
-            <div className="text-sm">
-              <Link to="/forgot-password" className="text-blue-600 hover:text-blue-500">
-                Forgot password?
-              </Link>
-            </div>
+            <button
+              type="submit"
+              disabled={state.isLoading}
+              className="burrow-button-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {state.isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
           </div>
 
-          <button
-            type="submit"
-            disabled={state.isLoading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {state.isLoading ? 'Signing in...' : 'Sign in'}
-          </button>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              <Link to="/register" className="text-blue-600 hover:text-blue-500 font-medium">
-                Sign up
-              </Link>
-            </p>
+          <div className="text-center text-sm text-burrow-text-secondary">
+            Don&apos;t have an account?{' '}
+            <Link to="/register" className="text-burrow-primary hover:text-burrow-secondary font-medium">
+              Sign up
+            </Link>
           </div>
         </form>
       </div>

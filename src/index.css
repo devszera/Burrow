@@ -2,6 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-burrow-background text-burrow-text-primary antialiased;
+    background-image: radial-gradient(circle at 10% 20%, rgba(240, 184, 96, 0.2) 0, transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(58, 91, 160, 0.18) 0, transparent 55%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 245, 248, 1));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-burrow-text-primary;
+  }
+
+  ::selection {
+    background: rgba(240, 184, 96, 0.35);
+    color: #2D2A32;
+  }
+
+  .text-gray-900,
+  .text-gray-800 {
+    @apply text-burrow-text-primary;
+  }
+
+  .text-gray-700,
+  .text-gray-600,
+  .text-gray-500 {
+    @apply text-burrow-text-secondary;
+  }
+
+  .text-gray-400 {
+    color: rgba(95, 91, 98, 0.55);
+  }
+
+  .text-blue-600,
+  .text-blue-500,
+  .text-blue-700,
+  .text-blue-800 {
+    @apply text-burrow-primary;
+  }
+
+  .hover\:text-blue-500:hover,
+  .hover\:text-blue-600:hover,
+  .hover\:text-blue-700:hover {
+    @apply text-burrow-secondary;
+  }
+
+  .bg-gray-50 {
+    @apply bg-burrow-background/80;
+  }
+
+  .bg-gray-100,
+  .bg-gray-200 {
+    @apply bg-burrow-muted;
+  }
+
+  .border-gray-100,
+  .border-gray-200,
+  .border-gray-300 {
+    @apply border-burrow-border;
+  }
+
+  .bg-blue-600,
+  .bg-blue-700 {
+    @apply bg-burrow-primary;
+  }
+
+  .hover\:bg-blue-700:hover,
+  .hover\:bg-blue-600:hover {
+    @apply bg-burrow-secondary;
+  }
+
+  .bg-blue-50 {
+    background-color: rgba(58, 91, 160, 0.08);
+  }
+
+  .border-blue-200 {
+    border-color: rgba(58, 91, 160, 0.2);
+  }
+
+  .focus\:ring-blue-500,
+  .focus\:ring-blue-500:focus,
+  .focus\:ring-blue-500:focus-visible,
+  .focus\:ring-blue-500:focus-within {
+    --tw-ring-color: theme('colors.burrow.primary');
+  }
+
+  .hover\:bg-gray-50:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+@layer components {
+  .burrow-card {
+    @apply bg-burrow-surface border border-burrow-border rounded-3xl shadow-burrow-soft;
+  }
+
+  .burrow-chip {
+    @apply inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-burrow-muted text-burrow-text-secondary;
+  }
+
+  .burrow-button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-burrow-primary px-8 py-3 text-base font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-burrow;
+  }
+
+  .burrow-button-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-burrow-border bg-transparent px-8 py-3 text-base font-semibold text-burrow-text-primary transition-colors duration-200 hover:bg-white/70;
+  }
+}
+
 @keyframes burrow-fade-in-up {
   from {
     opacity: 0;

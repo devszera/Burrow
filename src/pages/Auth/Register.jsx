@@ -86,26 +86,27 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 page-fade">
+    <div className="min-h-screen flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 page-fade">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-gray-600">Join Burrow and take control of your deliveries</p>
+        <div className="text-center space-y-2">
+          <span className="burrow-chip">Join Burrow</span>
+          <h2 className="text-3xl font-bold">Create your account</h2>
+          <p className="text-burrow-text-secondary">Take control of your deliveries in minutes.</p>
         </div>
 
         {state.error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="burrow-card border-red-200/70 bg-red-50/60 p-4 text-left">
             <p className="text-red-600 text-sm">{state.error}</p>
           </div>
         )}
 
         <form className="mt-8 space-y-6 fade-stagger" onSubmit={handleSubmit}>
-          <div className="space-y-4 fade-stagger">
+          <div className="burrow-card p-8 space-y-5 fade-stagger">
             <div>
               <label htmlFor="name" className="sr-only">Full Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-burrow-text-secondary" />
                 </div>
                 <input
                   id="name"
@@ -114,8 +115,8 @@ const Register = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className={`pl-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  className={`pl-10 w-full px-3 py-3 border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90 ${
+                    errors.name ? 'border-red-300' : 'border-burrow-border'
                   }`}
                   placeholder="Full Name"
                 />
@@ -127,7 +128,7 @@ const Register = () => {
               <label htmlFor="email" className="sr-only">Email address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-burrow-text-secondary" />
                 </div>
                 <input
                   id="email"
@@ -136,8 +137,8 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`pl-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  className={`pl-10 w-full px-3 py-3 border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90 ${
+                    errors.email ? 'border-red-300' : 'border-burrow-border'
                   }`}
                   placeholder="Email address"
                 />
@@ -149,7 +150,7 @@ const Register = () => {
               <label htmlFor="phone" className="sr-only">Phone Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                  <Phone className="h-5 w-5 text-burrow-text-secondary" />
                 </div>
                 <input
                   id="phone"
@@ -158,8 +159,8 @@ const Register = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`pl-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.phone ? 'border-red-300' : 'border-gray-300'
+                  className={`pl-10 w-full px-3 py-3 border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90 ${
+                    errors.phone ? 'border-red-300' : 'border-burrow-border'
                   }`}
                   placeholder="Phone Number"
                 />
@@ -171,7 +172,7 @@ const Register = () => {
               <label htmlFor="password" className="sr-only">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-burrow-text-secondary" />
                 </div>
                 <input
                   id="password"
@@ -180,21 +181,17 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`pl-10 pr-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`pl-10 pr-10 w-full px-3 py-3 border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90 ${
+                    errors.password ? 'border-red-300' : 'border-burrow-border'
                   }`}
                   placeholder="Password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-burrow-text-secondary"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
@@ -204,7 +201,7 @@ const Register = () => {
               <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-burrow-text-secondary" />
                 </div>
                 <input
                   id="confirmPassword"
@@ -213,64 +210,62 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`pl-10 pr-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  className={`pl-10 pr-10 w-full px-3 py-3 border rounded-2xl focus:ring-2 focus:ring-burrow-primary focus:border-transparent bg-white/90 ${
+                    errors.confirmPassword ? 'border-red-300' : 'border-burrow-border'
                   }`}
                   placeholder="Confirm Password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-burrow-text-secondary"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {errors.confirmPassword && <p className="text-red-600 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
 
-          <div className="flex items-center">
-            <input
-              id="accept-terms"
-              name="accept-terms"
-              type="checkbox"
-              checked={acceptTerms}
-              onChange={(event) => setAcceptTerms(event.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="accept-terms" className="ml-2 block text-sm text-gray-700">
-              I accept the{' '}
-              <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-                Terms and Conditions
-              </Link>{' '}
-              and{' '}
-              <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
-                Privacy Policy
-              </Link>
-            </label>
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(event) => setAcceptTerms(event.target.checked)}
+                className="h-4 w-4 rounded border-burrow-border text-burrow-primary focus:ring-burrow-primary"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="terms" className="font-medium text-burrow-text-primary">
+                I agree to the{' '}
+                <Link to="/terms" className="text-burrow-primary hover:text-burrow-secondary">
+                  terms and conditions
+                </Link>{' '}
+                and{' '}
+                <Link to="/privacy" className="text-burrow-primary hover:text-burrow-secondary">
+                  privacy policy
+                </Link>
+              </label>
+            </div>
           </div>
           {errors.terms && <p className="text-red-600 text-xs">{errors.terms}</p>}
 
           <button
             type="submit"
             disabled={state.isLoading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="burrow-button-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {state.isLoading ? 'Creating account...' : 'Create account'}
           </button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
-                Sign in
-              </Link>
-            </p>
+          <div className="text-center text-sm text-burrow-text-secondary">
+            Already have an account?{' '}
+            <Link to="/login" className="text-burrow-primary hover:text-burrow-secondary font-medium">
+              Sign in
+            </Link>
           </div>
         </form>
       </div>
