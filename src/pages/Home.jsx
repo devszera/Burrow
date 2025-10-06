@@ -121,6 +121,7 @@ const Home = () => {
               <WarehouseMap
                 onWarehouseSelect={setSelectedWarehouse}
                 selectedWarehouseId={selectedWarehouse?.id}
+                showSelectionDetails={false}
               />
             </div>
 

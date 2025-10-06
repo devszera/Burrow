@@ -46,7 +46,7 @@ ChangeMapView.propTypes = {
   center: PropTypes.arrayOf(PropTypes.number)
 };
 
-const WarehouseMap = ({ onWarehouseSelect, selectedWarehouseId }) => {
+const WarehouseMap = ({ onWarehouseSelect, selectedWarehouseId, showSelectionDetails = true }) => {
   const [isMapReady, setIsMapReady] = useState(false);
 
   useEffect(() => {
@@ -115,20 +115,28 @@ const WarehouseMap = ({ onWarehouseSelect, selectedWarehouseId }) => {
         )}
       </div>
 
-      <div className="bg-burrow-background rounded-lg border border-burrow-primary/30 p-4 min-h-[112px] flex flex-col justify-center">
-        {selectedWarehouse ? (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="font-medium text-burrow-text-primary">Warehouse Selected</span>
+      {showSelectionDetails && (
+        <div
+          className={`rounded-lg border p-4 flex flex-col gap-2 transition-colors duration-200 ${
+            selectedWarehouse ? 'bg-green-50 border-green-400' : 'bg-burrow-background border-burrow-primary/30'
+          }`}
+        >
+          {selectedWarehouse ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium text-burrow-text-primary">Warehouse Selected</span>
+              </div>
+              <p className="text-burrow-text-primary font-semibold">{selectedWarehouse.name}</p>
+              <p className="text-burrow-text-secondary text-sm">{selectedWarehouse.address}</p>
             </div>
-            <p className="text-burrow-text-primary font-semibold">{selectedWarehouse.name}</p>
-            <p className="text-burrow-text-secondary text-sm">{selectedWarehouse.address}</p>
-          </div>
-        ) : (
-          <p className="text-burrow-text-secondary text-sm text-center">Select a warehouse to view its details here.</p>
-        )}
-      </div>
+          ) : (
+            <p className="text-burrow-text-secondary text-sm text-center">
+              Select a warehouse to view its details here.
+            </p>
+          )}
+        </div>
+      )}
 
     </div>
   );
@@ -138,5 +146,6 @@ export default WarehouseMap;
 
 WarehouseMap.propTypes = {
   onWarehouseSelect: PropTypes.func,
-  selectedWarehouseId: PropTypes.string
+  selectedWarehouseId: PropTypes.string,
+  showSelectionDetails: PropTypes.bool
 };
