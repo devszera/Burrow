@@ -350,7 +350,7 @@ const OperatorDashboard = () => {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[32rem] overflow-y-auto">
             <table className="table">
               <thead className="table-head">
                 <tr>
