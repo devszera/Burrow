@@ -5,17 +5,6 @@ import { serialiseDocument, toObjectId } from '../utils/formatters.js';
 import { isDemoUserEmail, seedDemoUsers } from '../lib/seedDemoData.js';
 
 const DEMO_ACCOUNTS = {
-  'user@test.com': {
-    password: 'UserDemo1',
-    user: {
-      id: 'demo-user',
-      name: 'Demo Customer',
-      email: 'user@test.com',
-      role: 'consumer',
-      privileges: ['consumer'],
-      isActive: true
-    }
-  },
   'admin@burrow.com': {
     password: 'AdminDemo1',
     user: {
