@@ -127,13 +127,6 @@ const Login = () => {
               </label>
             </div>
 
-            <div className="text-sm">
-              <Link to="/forgot-password" className="nav-link">
-                Forgot password?
-              </Link>
-            </div>
-          </div>
-
           <button
             type="submit"
             disabled={state.isLoading}
