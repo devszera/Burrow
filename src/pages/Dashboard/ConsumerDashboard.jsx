@@ -182,7 +182,7 @@ const ConsumerDashboard = () => {
             <h2 className="text-xl font-semibold text-burrow-text-primary">Recent Requests</h2>
           </div>
 
-          <div className="divide-y divide-burrow-border">
+          <div className="divide-y divide-burrow-border max-h-[24rem] overflow-y-auto">
             {error && (
               <div className="px-6 py-4 text-sm text-red-600 bg-red-50 border-b border-red-100">{error}</div>
             )}
@@ -192,7 +192,7 @@ const ConsumerDashboard = () => {
             )}
 
             {!isLoading && !error && userRequests.length > 0 ? (
-              userRequests.slice(0, 5).map((request) => (
+              userRequests.map((request) => (
                 <div key={request.id} className="px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -232,14 +232,6 @@ const ConsumerDashboard = () => {
               </div>
             )}
           </div>
-
-          {!isLoading && !error && userRequests.length > 5 && (
-            <div className="px-6 py-4 border-t border-burrow-border/80 bg-burrow-background">
-              <Link to="/orders" className="nav-link font-medium text-sm">
-                View all requests →
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>
