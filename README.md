@@ -2,6 +2,20 @@
 
 This repository contains the Burrow delivery reschedule web experience. It now includes an Express based backend that connects to MongoDB Atlas for persisting authentication, warehouse, and delivery request data.
 
+## Technology Stack Overview
+
+The project combines a TypeScript-friendly React frontend with a lightweight Express API. Each tool keeps to a single job so the overall system stays easy to reason about even if you only have Python experience.
+
+- **Vite + React + TypeScript** – Vite provides fast development builds, while React renders the user interface and TypeScript keeps component props and helper functions well typed. Scripts such as `npm run dev` and `npm run build` are powered by Vite’s tooling. 【F:package.json†L7-L27】【F:tsconfig.json†L1-L29】
+- **React Router & Context APIs** – Routing between pages (dashboards, forms, trackers) is handled client side, and shared state such as authentication lives in React Context providers. This mirrors how Flask blueprints and global objects work, but in the browser. 【F:src/App.jsx†L1-L48】【F:src/context/AuthContext.jsx†L1-L152】
+- **Tailwind CSS + PostCSS** – Tailwind supplies utility classes for styling the interface, with PostCSS and Autoprefixer bundling the CSS so it works across browsers. This keeps the styling declarative and component-scoped. 【F:package.json†L28-L38】【F:tailwind.config.js†L1-L25】
+- **Leaflet map utilities** – Leaflet and React Leaflet render the warehouse map and marker interactions on the home page, giving a visual warehouse picker without custom map math. 【F:package.json†L17-L23】【F:src/components/WarehouseMap.jsx†L1-L173】
+- **Express.js server** – The backend exposes `/auth`, `/requests`, and `/warehouses` routes, applies CORS, and parses JSON payloads. It is comparable to a minimal Flask app in structure. 【F:server/index.js†L1-L55】
+- **MongoDB Atlas + MongoDB driver** – Persistent data lives in a MongoDB Atlas cluster accessed via the official driver. During local development an in-memory MongoDB server spins up automatically if a real connection string is missing, so you can experiment without installing MongoDB yourself. 【F:server/lib/mongoClient.js†L1-L126】
+- **Authentication helpers** – `bcryptjs` hashes passwords before storage, and the auth routes seed demo accounts for quick logins. This plays a role similar to Werkzeug security in Flask. 【F:package.json†L13-L21】【F:server/routes/auth.js†L1-L196】
+- **Environment management** – `dotenv` loads `.env` files so secrets like Atlas credentials stay out of source control, and the API script `npm run server` bootstraps everything using those values. 【F:package.json†L13-L21】【F:server/index.js†L1-L55】
+- **Testing & linting tooling** – ESLint, React-specific lint rules, and TypeScript configuration files help keep code quality consistent without a separate test harness. 【F:package.json†L28-L38】【F:eslint.config.js†L1-L49】
+
 ## Project Structure
 
 ```
