@@ -127,6 +127,8 @@ const Login = () => {
               </label>
             </div>
 
+          </div>
+
           <button
             type="submit"
             disabled={state.isLoading}
