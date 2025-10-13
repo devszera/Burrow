@@ -4,13 +4,6 @@ import bcrypt from 'bcryptjs';
 
 export const DEMO_USERS = [
   {
-    name: 'Demo Customer',
-    email: 'user@test.com',
-    password: 'UserDemo1',
-    role: 'consumer',
-    privileges: ['consumer']
-  },
-  {
     name: 'Burrow Admin',
     email: 'admin@burrow.com',
     password: 'AdminDemo1',
