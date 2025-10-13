@@ -79,6 +79,21 @@ const NewRequest = () => {
   const [submitError, setSubmitError] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
 
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const oneYearFromToday = useMemo(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    return date.toISOString().split('T')[0];
+  }, []);
+  const scheduledDeliveryMinDate = formData.originalETA || today;
+  const scheduledDeliveryMaxDate = useMemo(() => {
+    const baseDate = formData.originalETA || today;
+    const date = new Date(baseDate);
+    if (Number.isNaN(date.getTime())) return '';
+    date.setFullYear(date.getFullYear() + 1);
+    return date.toISOString().split('T')[0];
+  }, [formData.originalETA, today]);
+
   // Keeps the visible step in sync if someone opens the page with a step link.
   useEffect(() => {
     setCurrentStep(initialStep);
@@ -590,6 +605,8 @@ const NewRequest = () => {
                     name="originalETA"
                     value={formData.originalETA}
                     onChange={handleInputChange}
+                    min={today}
+                    max={oneYearFromToday}
                     className={`input-field-plain ${
                       errors.originalETA ? 'border-red-300 focus:border-red-400 focus:ring-red-400' : ''
                     }`}
@@ -660,7 +677,8 @@ const NewRequest = () => {
                     name="scheduledDeliveryDate"
                     value={formData.scheduledDeliveryDate}
                     onChange={handleInputChange}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={scheduledDeliveryMinDate}
+                    max={scheduledDeliveryMaxDate}
                     className={`input-field-plain ${
                       errors.scheduledDeliveryDate
                         ? 'border-red-300 focus:border-red-400 focus:ring-red-400'
